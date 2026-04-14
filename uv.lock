@@ -345,6 +345,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "python-jose", extra = ["cryptography"] },
     { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 
 [package.metadata]
@@ -357,6 +358,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.5.0" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.43.0" },
 ]
 
 [[package]]
