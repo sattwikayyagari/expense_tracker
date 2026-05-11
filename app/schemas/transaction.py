@@ -11,6 +11,12 @@ class TransactionCreate(BaseModel):
     bank: Optional[str]
     date: datetime
 
+class TransactionUpdate(BaseModel):
+    amount: Optional[float] = None
+    merchant: Optional[str] = None
+    bank: Optional[str] = None
+    date: Optional[datetime] = None
+
 class TransactionRead(BaseModel):
     id: int
     amount: float
