@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
 from sqlalchemy import select
 from app.schemas.user import UserCreate, UserUpdate
+from app.core.security import get_hashed_password
 
 async def get_user_by_email(db:AsyncSession, email: str):
     db_user= await db.execute(select(User).where(User.email==email))
@@ -18,7 +19,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
         raise ValueError("User already exists")
     db_user= User(
         email= user.email,
-        hashed_password=user.password
+        hashed_password=get_hashed_password(user.password)
     )
     db.add(db_user)
     await db.commit()
@@ -31,7 +32,7 @@ async def update_user(db:AsyncSession, user: UserUpdate, user_id: int):
     if user.email is not None:
         db_user.email=user.email
     if user.password is not None:
-        db_user.hashed_password=user.password
+        db_user.hashed_password=get_hashed_password(user.password)
     
     await db.commit()
     await db.refresh(db_user)

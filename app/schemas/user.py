@@ -1,7 +1,10 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Annotated, Optional
 
-
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    
 class UserCreate(BaseModel):
     email: EmailStr
     password: Annotated[str,Field(min_length=8, description='Enter the password')]
