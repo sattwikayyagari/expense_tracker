@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.user import UserCreate, UserResponse, UserUpdate, Token, UserLogin
 from app.crud.user import create_user, get_user_by_email, get_user_by_id, update_user as crud_update_user, delete_user as crud_delete_user
 from app.core.security import verify_hashed_password, create_access_token
+from app.core.dependencies import get_current_user
 
 router=APIRouter(prefix='/users', tags=["users"])
 
@@ -28,14 +29,14 @@ async def user_login(request: UserLogin,db: AsyncSession = Depends(get_db)):
     return {'access_token': token_generated, 'token_type': 'bearer'}
     
 @router.get("/{user_id}",response_model=UserResponse, status_code=200)
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def get_user(user_id: int, db: AsyncSession = Depends(get_db), current_user= Depends(get_current_user)):
     db_user= await get_user_by_id(db, user_id)
     if db_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_user
 
 @router.patch("/{user_id}", response_model=UserResponse, status_code=200)
-async def update_user(user_id: int, user: UserUpdate, db: AsyncSession= Depends(get_db)):
+async def update_user(user_id: int, user: UserUpdate, db: AsyncSession= Depends(get_db), current_user= Depends(get_current_user)):
     db_user= await get_user_by_id(db, user_id)
     if db_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -43,7 +44,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession= Depends(
     return updated_user
 
 @router.delete("/{user_id}", status_code=200)
-async def delete_user(user_id: int, db: AsyncSession=Depends(get_db)):
+async def delete_user(user_id: int, db: AsyncSession=Depends(get_db), current_user= Depends(get_current_user)):
     db_user= await get_user_by_id(db, user_id)
     if db_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
