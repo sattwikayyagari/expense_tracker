@@ -4,12 +4,13 @@ from app.models.transaction import Transaction
 from sqlalchemy import select
 from datetime import datetime
 
-async def create_transaction(db: AsyncSession, transaction: TransactionCreate):
+async def create_transaction(db: AsyncSession, transaction: TransactionCreate, user_id: int):
     db_transaction= Transaction(
         amount=transaction.amount,
         merchant=transaction.merchant,
         bank=transaction.bank,
         date=transaction.date,
+        user_id=user_id
     )
     db.add(db_transaction)
     await db.commit()
@@ -32,12 +33,12 @@ async def get_transaction_by_category(db: AsyncSession, user_id: int, category: 
     result=await db.execute(select(Transaction).where(Transaction.user_id==user_id, Transaction.category==category))
     return result.scalars().all()
 
-async def get_transction_by_date_category(db: AsyncSession, user_id: int, start_date: datetime, end_date: datetime, category: str):
+async def get_transaction_by_date_category(db: AsyncSession, user_id: int, start_date: datetime, end_date: datetime, category: str):
     result=await db.execute(select(Transaction).where(Transaction.user_id==user_id, Transaction.date>=start_date, Transaction.date<=end_date, Transaction.category==category))
     return result.scalars().all()
 
 async def update_transaction(db: AsyncSession, transaction_id: int, transaction: TransactionUpdate):
-    db_transaction= await get_transaction(db, transaction_id)    
+    db_transaction= await get_transaction(db, transaction_id)
 
     if transaction.amount is not None:
         db_transaction.amount=transaction.amount
@@ -45,6 +46,8 @@ async def update_transaction(db: AsyncSession, transaction_id: int, transaction:
         db_transaction.merchant=transaction.merchant
     if transaction.bank is not None:
         db_transaction.bank=transaction.bank
+    if transaction.date is not None:
+        db_transaction.date=transaction.date
 
     await db.commit()
     await db.refresh(db_transaction)
@@ -55,4 +58,4 @@ async def delete_transaction(db: AsyncSession, transaction_id: int):
 
     await db.delete(db_transaction)
     await db.commit()
-    return f"Transaction with id {transaction_id} succes    sfully deleted"
+    return f"Transaction with id {transaction_id} successfully deleted"

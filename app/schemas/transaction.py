@@ -18,7 +18,7 @@ class TransactionUpdate(BaseModel):
     date: Optional[datetime] = None
 
 class TransactionRead(BaseModel):
-    id: int
+    transaction_id: int
     amount: float
     merchant: str
     bank: Optional[str]
